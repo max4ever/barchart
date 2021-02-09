@@ -1,0 +1,221 @@
+<html>
+
+<head>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/js/tabulator.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/tabulator_simple.min.css" rel="stylesheet">
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+
+    <style>
+        .tabulator .tabulator-row.tabulator-row-even:not(:hover) {
+            background-color: #f9fafb;
+        }
+
+        #main-table {
+            width: 1400px;
+            margin: auto;
+        }
+
+
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 20px;
+            width: 480px;
+            font-family: sans-serif;
+            margin: auto;
+            padding: 20px;
+        }
+
+        #drop-area.highlight {
+            border-color: purple;
+        }
+
+        p {
+            margin-top: 0;
+        }
+
+        .my-form {
+            margin-bottom: 10px;
+        }
+
+        #gallery {
+            margin-top: 10px;
+        }
+
+        #gallery img {
+            width: 150px;
+            margin-bottom: 10px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px;
+            background: #ccc;
+            cursor: pointer;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .button:hover {
+            background: #ddd;
+        }
+
+        #fileElem {
+            display: none;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <h1 id="fileName"></h1>
+    <div id="drop-area">
+        <form class="my-form">
+            <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+            <input type="file" id="fileElem" multiple accept="" .csv" onchange="handleFiles(this.files)">
+            <label class="button" for="fileElem">Select some files</label>
+        </form>
+    </div>
+
+
+    <button id="unselect-all">Unselect all rows</button><br />
+    <div id="main-table"></div>
+
+
+    <script>
+
+        let dropArea = document.getElementById('drop-area');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false)
+        })
+
+        function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false)
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false)
+        });
+
+        function highlight(e) {
+            dropArea.classList.add('highlight')
+        }
+
+        function unhighlight(e) {
+            dropArea.classList.remove('highlight')
+        }
+
+
+        dropArea.addEventListener('drop', handleDrop, false)
+
+        function handleDrop(e) {
+            let dt = e.dataTransfer
+            let files = dt.files
+
+            handleFiles(files)
+        }
+
+        function handleFiles(files) {
+            ([...files]).forEach(uploadFile)
+        }
+
+        function uploadFile(file) {
+
+            document.getElementById('fileName').textContent = file.name;
+
+            Papa.parse(file, {
+                worker: true,
+                header: true,
+                comments: "Downloaded",
+                complete: function (results) {
+                    console.log(results);
+                    startTable(results);
+                }
+            });
+        }
+
+        function startTable(tableData) {
+            var table = new Tabulator("#main-table", {
+                height: "calc(100% - 230px)",
+                layout: "fitColumns",
+                movableRows: true,
+                groupBy: "gender",
+                data: tableData.data,
+                movableRows: false,
+                
+                clipboard: "copy",
+                clipboardCopyConfig: {
+                    columnHeaders: false, //do not include column headers in clipboard output
+                    columnGroups: false, //do not include column groups in column headers for printed table
+                    rowGroups: false, //do not include row groups in clipboard output
+                    columnCalcs: false, //do not include column calculation rows in clipboard output
+                    dataTree: false, //do not include data tree in printed table
+                    formatCells: false, //show raw cell values without formatter
+                },
+                clipboardCopyRowRange:"selected",
+
+                groupBy: "Symbol",
+                autoColumns: true,
+                persistence: {
+                    sort: true,
+                    // filter: true,
+                    columns: true,
+                },
+                pagination: "local",
+                groupStartOpen: false,
+                groupToggleElement: "header",
+                selectable: true,
+                // columns: [
+                //     { formatter: "rownum", hozAlign: "center", width: 40 },
+                //     { formatter: printIcon, width: 40, hozAlign: "center", cellClick: function (e, cell) { alert("Printing row data for: " + cell.getRow().getData().name) } },
+                //     {
+                //         title: "Name", field: "name", width: 150, formatter: function (cell, formatterParams) {
+                //             var value = cell.getValue();
+                //             if (value.indexOf("o") > 0) {
+                //                 return "<span style='color:red; font-weight:bold;'>" + value + "</span>";
+                //             } else {
+                //                 return value;
+                //             }
+                //         }
+                //     },
+                //     { title: "Progress", field: "progress", formatter: "progress", formatterParams: { color: ["#00dd00", "orange", "rgb(255,0,0)"] }, sorter: "number", width: 100 },
+                //     { title: "Rating", field: "rating", formatter: "star", formatterParams: { stars: 6 }, hozAlign: "center", width: 120 },
+                //     { title: "Driver", field: "car", hozAlign: "center", formatter: "tickCross", width: 50 },
+                //     { title: "Col", field: "col", formatter: "color", width: 50 },
+                //     { title: "Line Wraping", field: "lorem", formatter: "textarea" },
+                //     { formatter: "buttonCross", width: 30, hozAlign: "center" }
+                // ],
+                //             [
+                //                 { title: "Name", field: "name", width: 200 },
+                //                 { title: "Progress", field: "progress", formatter: "progress", sorter: "number" },
+                //                 { title: "Gender", field: "gender" },
+                //                 { title: "Rating", field: "rating", formatter: "star", hozAlign: "center", width: 100 },
+                //                 { title: "Favourite Color", field: "col" },
+                //                 { title: "Date Of Birth", field: "dob", hozAlign: "center", sorter: "date" },
+                //                 { title: "Driver", field: "car", hozAlign: "center", formatter: "tickCross" },
+                // ],
+            });
+
+            document.getElementById('unselect-all').onclick = function(){
+                var selectedRows = table.getSelectedRows();
+                selectedRows.forEach(element => table.deselectRow(element));
+            }
+
+
+        }
+
+
+
+    </script>
+</body>
+
+</html>
