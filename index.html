@@ -7,7 +7,7 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <style>
-        .tabulator .tabulator-row.tabulator-row-even:not(:hover) {
+        .tabulator .tabulator-row.tabulator-row-even:not(:hover):not(.tabulator-selected) {
             background-color: #f9fafb;
         }
 
@@ -74,7 +74,6 @@
     <h1 id="fileName"></h1>
     <div id="drop-area">
         <form class="my-form">
-            <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
             <input type="file" id="fileElem" multiple accept="" .csv" onchange="handleFiles(this.files)">
             <label class="button" for="fileElem">Select some files</label>
         </form>
@@ -82,7 +81,7 @@
 
 
     <button id="unselect-all">Unselect all rows</button><br />
-    <div id="main-table"></div>
+    <div id="main-table" style="height: 80%"></div>
 
 
     <script>
@@ -145,7 +144,7 @@
 
         function startTable(tableData) {
             var table = new Tabulator("#main-table", {
-                height: "calc(100% - 230px)",
+                height: "70%",
                 layout: "fitColumns",
                 movableRows: true,
                 groupBy: "gender",
@@ -174,6 +173,15 @@
                 groupStartOpen: false,
                 groupToggleElement: "header",
                 selectable: true,
+                groupHeader: function (value, count, data, group) {
+
+                    return value + "<span style='color:#d00; margin-left:10px;'>(" + count + " item)</span>" +
+                        ' <a href="https://www.marketbeat.com/stocks/' + value + '/" target="_blank"><img src="https://www.marketbeat.com/images/2favicon.png" alt="MarketBeat" height="16" width="16"/></a>' +
+                        ' <a href="https://stocktwits.com/symbol/' + value + '/" target="_blank"><img src="https://stocktwits.com/favicon.png" alt="StockTwits" height="16" width="16" /></a>' +
+                        ' <a href="https://www.barchart.com/stocks/quotes/' + value + '/" target="_blank"><img src="https://d1l7hzv7igdihb.cloudfront.net/favicon.ico" alt="BarChart" height="16" width="16" /></a>'
+                        ;
+                },
+
                 // columns: [
                 //     { formatter: "rownum", hozAlign: "center", width: 40 },
                 //     { formatter: printIcon, width: 40, hozAlign: "center", cellClick: function (e, cell) { alert("Printing row data for: " + cell.getRow().getData().name) } },
