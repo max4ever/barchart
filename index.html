@@ -3,81 +3,30 @@
 <head>
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/js/tabulator.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/tabulator_simple.min.css" rel="stylesheet">
-
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
-    <style>
-        a.openAllLinks {
-            text-decoration: none;
-        }
 
-        .tabulator .tabulator-row.tabulator-row-even:not(:hover):not(.tabulator-selected) {
-            background-color: #f9fafb;
-        }
+    <script type="text/javascript" src="./js/tradingviewIframe.js"></script>
 
-        #main-table {
-            width: 1400px;
-            margin: auto;
-        }
-
-
-        #drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 20px;
-            width: 480px;
-            font-family: sans-serif;
-            margin: auto;
-            padding: 20px;
-        }
-
-        #drop-area.highlight {
-            border-color: purple;
-        }
-
-        p {
-            margin-top: 0;
-        }
-
-        .my-form {
-            margin-bottom: 10px;
-        }
-
-        #gallery {
-            margin-top: 10px;
-        }
-
-        #gallery img {
-            width: 150px;
-            margin-bottom: 10px;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 10px;
-            background: #ccc;
-            cursor: pointer;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .button:hover {
-            background: #ddd;
-        }
-
-        #fileElem {
-            display: none;
-        }
-    </style>
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/tabulator_simple.min.css" rel="stylesheet">
+    <link href="./css/main.css" rel="stylesheet">
+    <link href="./css/tradingview.css" rel="stylesheet">
 
 </head>
 
 <body>
-    <h1 id="fileName"></h1>
+
+    <div id="tradingView-wrapper" style="display:none">
+        <div id="tradingView-popup">
+            <iframe id="tradingViewIframe" src="">
+                <p>Your browser does not support iframes.</p>
+            </iframe>
+            <a href="#" class="close" onclick="closeTradingViewIframe()">X</a>
+        </div>
+    </div>
+
+
     <div id="drop-area">
         <form class="my-form">
             <input type="file" id="fileElem" multiple accept="" .csv" onchange="handleFiles(this.files)">
@@ -85,13 +34,14 @@
         </form>
     </div>
 
-
+    <p id="fileName">
+        <button id="fullscreen" onclick="document.body.parentElement.requestFullscreen()">Fullscreen</button>
+    </p>
     <button id="unselect-all" style="display:none">Unselect all rows</button><br />
+
     <div id="main-table" style="height: 80%"></div>
 
-
     <script>
-
         let dropArea = document.getElementById('drop-area');
 
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -135,7 +85,7 @@
 
         function uploadFile(file) {
 
-            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileName').innerHTML += file.name;
 
             Papa.parse(file, {
                 worker: true,
@@ -150,8 +100,9 @@
 
         function startTable(tableData) {
             document.getElementById('unselect-all').style.display = 'block';
+            document.getElementById('drop-area').style.display = 'none';
 
-            var table = new Tabulator("#main-table", {
+            var table = window.tabulatorTable = new Tabulator("#main-table", {
                 height: "70%",
                 layout: "fitColumns",
                 movableRows: true,
@@ -184,10 +135,20 @@
                 groupHeader: function (value, count, data, group) {
 
                     return value + "<span style='color:#d00; margin-left:10px;'>(" + count + " item)</span>" +
-                        ' <a href="#" class="openAllLinks" onClick="event.stopPropagation(); openLinks(\'' + value + '\'); return false;"><img src="https://www.marketbeat.com/images/2favicon.png" alt="MarketBeat" height="16" width="16"/> <img src="https://stocktwits.com/favicon.png" alt="StockTwits" height="16" width="16" /> <img src="https://d1l7hzv7igdihb.cloudfront.net/favicon.ico" alt="BarChart" height="16" width="16" /></a>'
+                        ' <a href="#" class="openAllLinks" onClick="event.stopPropagation(); openLinks(\'' + value + '\'); return false;"><img src="https://www.marketbeat.com/images/2favicon.png" alt="MarketBeat" height="16" width="16"/> <img src="https://stocktwits.com/favicon.png" alt="StockTwits" height="16" width="16" /> <img src="https://d1l7hzv7igdihb.cloudfront.net/favicon.ico" alt="BarChart" height="16" width="16" /></a>' +
+                        ''
                         ;
                 }
+
             });
+
+            function customFilter(data, filterParams){
+                return data.Symbol != "" && data.Symbol.length < 10;
+            }
+
+            table.setFilter(customFilter);
+
+            openTradingView(table);
 
             document.getElementById('unselect-all').onclick = function () {
                 var selectedRows = table.getSelectedRows();
@@ -196,10 +157,12 @@
 
         }
 
-        function openLinks(stock) {
-            openInNewTab('https://www.barchart.com/stocks/quotes/' + stock + '/');
-            openInNewTab('https://stocktwits.com/symbol/' + stock + '/');
-            openInNewTab('https://www.marketbeat.com/stocks/' + stock + '/');
+        function openLinks(stockName) {
+            openInNewTab('https://www.barchart.com/stocks/quotes/' + stockName + '/');
+            openInNewTab('https://stocktwits.com/symbol/' + stockName + '/');
+            openInNewTab('https://www.marketbeat.com/stocks/' + stockName + '/');
+
+            openTradingViewIframe(stockName);
 
             return false;
         }
@@ -210,8 +173,6 @@
                 href: href,
             }).click();
         }
-
-
 
     </script>
 </body>

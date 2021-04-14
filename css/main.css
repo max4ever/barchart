@@ -1,0 +1,92 @@
+a.openAllLinks, a.openTradingView {
+    text-decoration: none;
+    text-decoration: none;
+    position: absolute;
+    left: 200px;
+}
+
+a.openTradingView {
+    left: 176px;
+}
+
+.tabulator .tabulator-row.tabulator-row-even:not(:hover):not(.tabulator-selected) {
+    background-color: #f9fafb;
+}
+
+#main-table {
+    width: 1400px;
+    margin: auto;
+}
+
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 20px;
+    width: 480px;
+    font-family: sans-serif;
+    margin: auto;
+    padding: 20px;
+}
+
+#drop-area.highlight {
+    border-color: purple;
+}
+
+p {
+    margin-top: 0;
+}
+
+.my-form {
+    margin-bottom: 10px;
+}
+
+#gallery {
+    margin-top: 10px;
+}
+
+#gallery img {
+    width: 150px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px;
+    background: #ccc;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.button:hover {
+    background: #ddd;
+}
+
+#fileElem {
+    display: none;
+}
+
+#unselect-all {
+    margin-left: 30px;
+}
+
+#drop-area label {
+    width: calc(100% - 20px);
+}
+
+#tradingView-popup {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    resize: vertical;
+    overflow: hidden;
+    border: 1px solid black;
+}
+
+#tradingViewIframe {
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    border: 0
+}
