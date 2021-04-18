@@ -11,3 +11,23 @@
 #tradingView-wrapper{
     margin-bottom: 5px;
 }
+
+
+iframe.tradingViewSymbolInfoIframe{
+    display: none;
+    box-sizing: border-box; 
+    height: 650px;
+    width: 480px;
+}
+
+
+div.tabulator-group span.showPopup{
+    position: absolute;
+    left: 300px;
+}
+
+div.tabulator-group span.showPopup:hover iframe.tradingViewSymbolInfoIframe{
+    display: block;
+    position:absolute;
+    z-index: 999;
+}

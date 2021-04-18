@@ -8,6 +8,7 @@
 
 
     <script type="text/javascript" src="./js/tradingviewIframe.js"></script>
+    <script type="text/javascript" src="./js/tradingViewSymbolProfile.js"></script>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.9.3/css/tabulator_simple.min.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
@@ -134,9 +135,10 @@
                 selectable: true,
                 groupHeader: function (value, count, data, group) {
 
+                    
                     return value + "<span style='color:#d00; margin-left:10px;'>(" + count + " item)</span>" +
                         ' <a href="#" class="openAllLinks" onClick="event.stopPropagation(); openLinks(\'' + value + '\'); return false;"><img src="https://www.marketbeat.com/images/2favicon.png" alt="MarketBeat" height="16" width="16"/> <img src="https://stocktwits.com/favicon.png" alt="StockTwits" height="16" width="16" /> <img src="https://d1l7hzv7igdihb.cloudfront.net/favicon.ico" alt="BarChart" height="16" width="16" /></a>' +
-                        ''
+                        ' <span class="showPopup"> Info' + getTradingViewSymbolInfoHtml(value) + '</div>'
                         ;
                 }
 

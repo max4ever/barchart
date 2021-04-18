@@ -1,6 +1,6 @@
 function openTradingViewIframe(stocksList){
     let iframe = document.getElementById("tradingViewIframe");
-    iframe.src = './html/tradingview.html?stocksList=' + stocksList;
+    iframe.src = './html/tradingViewChart.html?stocksList=' + stocksList;
 }
 
 
