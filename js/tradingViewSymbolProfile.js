@@ -13,7 +13,7 @@ function getTradingViewSymbolInfoHtml(symbolName){
                         "height": "650",
                         "colorTheme": "light",
                         "isTransparent": false,
-                        "locale": "it"
+                        "locale": "en"
                     }
                     </script>
                 </div>
